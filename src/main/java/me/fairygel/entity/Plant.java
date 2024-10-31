@@ -4,6 +4,8 @@ public class Plant extends Organism {
     public static Plant parse(String str) {
         String[] args = str.split("\t");
 
+        if (args.length != 3) return null;
+
         Plant plant = new Plant();
 
         plant.setId(Integer.parseInt(args[0]));

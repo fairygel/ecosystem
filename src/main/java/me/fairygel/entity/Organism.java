@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class Organism {
-    private int id;
+    private long id;
     private String name;
     private int population;
     private int energy;
@@ -19,6 +19,8 @@ public class Organism {
 
     public static Organism parse(String str) {
             String[] args = str.split("\t");
+
+            if (args.length != 3) return null;
 
             Organism organism = new Organism();
 

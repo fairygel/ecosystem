@@ -38,7 +38,6 @@ public class EcosystemController {
                     break;
                 case 3:
                     end = true;
-                    organismManager.end();
                     break;
                 default:
                     System.out.println("Unknown action");
@@ -77,6 +76,8 @@ public class EcosystemController {
         boolean end = false;
         boolean isAnimal = chooseOrganism();
 
+        organismManager.start();
+
         while (!end) {
             System.out.println("choose your action:");
             System.out.println("1. list organisms");
@@ -100,16 +101,72 @@ public class EcosystemController {
                     getByIdOrganism(isAnimal);
                     break;
                 case 4:
+                    updateOrganism(isAnimal);
                     break;
                 case 5:
+                    deleteOrganism(isAnimal);
                     break;
                 case 6:
                     end = true;
+                    organismManager.saveChanges();
                     break;
                 default:
                     System.out.println("Unknown action");
             }
         }
+    }
+
+    private long getId(boolean isAnimal) {
+        System.out.println("enter id: ");
+        long id = 0;
+
+        boolean end = false;
+
+        while (!end) {
+            try {
+                id = scanner.nextLong();
+
+                if (organismManager.getOrganismById(id, isAnimal) == null)
+                    throw new IllegalArgumentException("wrong id");
+
+                end = true;
+            } catch (Exception e) {
+                System.out.println("invalid input. please enter a correct number.");
+                scanner.nextLine();
+            }
+        }
+
+        return id;
+    }
+
+    private void deleteOrganism(boolean isAnimal) {
+        long id = getId(isAnimal);
+
+        organismManager.deleteOrganism(id, isAnimal);
+    }
+
+    private void updateOrganism(boolean isAnimal) {
+        long id = getId(isAnimal);
+        System.out.println("enter name of organism: ");
+
+        String name = scanner.next();
+        int energy = 0;
+
+        System.out.println("enter enter energy of organism: ");
+
+        boolean end = false;
+
+        while (!end) {
+            try {
+                energy = scanner.nextInt();
+                end = true;
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
+            }
+        }
+
+        organismManager.updateOrganism(id, name, energy, isAnimal);
     }
 
     private void getByIdOrganism(boolean isAnimal) {
@@ -119,7 +176,7 @@ public class EcosystemController {
         while (!end) {
             try {
                 long id = scanner.nextInt();
-                System.out.println(organismManager.getByIdOrganism(id, isAnimal));
+                System.out.println(organismManager.getOrganismById(id, isAnimal));
                 end = true;
             } catch (Exception e) {
                 System.out.println("invalid input. please enter a correct number.");
