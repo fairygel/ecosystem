@@ -4,16 +4,23 @@ import me.fairygel.entity.Ecosystem;
 import me.fairygel.entity.Soil;
 import me.fairygel.entity.Weather;
 import me.fairygel.entity.WeatherConditions;
+import me.fairygel.entity.organism.Organism;
 import me.fairygel.manager.EcosystemManager;
+import me.fairygel.manager.OrganismManager;
 import me.fairygel.utils.ScannerUtil;
 
 public class EcosystemController implements MenuController {
     private final EcosystemManager ecosystemManager;
+    private final OrganismController organismController;
 
     private final ScannerUtil scanner = new ScannerUtil();
 
-    public EcosystemController() {
+    public EcosystemController(MenuController organismController) {
         ecosystemManager = new EcosystemManager();
+
+        if (organismController instanceof OrganismController)
+            this.organismController = (OrganismController) organismController;
+        else throw new IllegalStateException("ecosystem controller can be created only with organism controller.");
     }
 
     @Override
@@ -27,7 +34,8 @@ public class EcosystemController implements MenuController {
             System.out.println("3. get info about ecosystem.");
             System.out.println("4. update ecosystem.");
             System.out.println("5. delete ecosystem.");
-            System.out.println("6. go back.");
+            System.out.println("6. add organism");
+            System.out.println("7. go back.");
             System.out.print("> ");
 
             int choice = scanner.nextInt();
@@ -49,12 +57,45 @@ public class EcosystemController implements MenuController {
                     deleteEcosystem();
                     break;
                 case 6:
+                    addOrganism();
+                    break;
+                case 7:
                     end = true;
                     break;
                 default:
                     System.out.println("Unknown action");
             }
         }
+    }
+
+    private void addOrganism() {
+        long ecosystemId = getId();
+        boolean isAnimal = organismController.chooseOrganism();
+
+        addOrganism(ecosystemId, isAnimal);
+    }
+
+    private void addOrganism(long ecosystemId, boolean isAnimal) {
+        String type = isAnimal? "animal" : "plant";
+        System.out.println(OrganismManager.getOrganisms(isAnimal));
+
+        System.out.println("enter id of organism: ");
+        long id = scanner.nextLong();
+
+        Organism organism = OrganismManager.readOrganismByIdAndType(id, type);
+
+        if (organism == null) {
+            System.out.printf("there is no %s with id=%s.%n", type, id);
+            addOrganism(ecosystemId, isAnimal);
+            return;
+        }
+
+        System.out.print("enter population: ");
+        int population = scanner.nextInt();
+
+        organism.setPopulation(population);
+
+        ecosystemManager.addOrganismToEcosystem(ecosystemId, organism);
     }
 
     private void createEcosystem() {

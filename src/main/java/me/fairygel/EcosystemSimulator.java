@@ -10,7 +10,7 @@ public class EcosystemSimulator {
 
     public EcosystemSimulator() {
         MenuController organismController = new OrganismController();
-        MenuController ecosystemController = new EcosystemController();
+        MenuController ecosystemController = new EcosystemController(organismController);
 
         mainMenuController = new MainMenuController(ecosystemController, organismController);
     }

@@ -52,4 +52,8 @@ public class Ecosystem {
 
         return firstPart + secondPart;
     }
+
+    public void addOrganism(Organism organism) {
+        organisms.add(organism);
+    }
 }

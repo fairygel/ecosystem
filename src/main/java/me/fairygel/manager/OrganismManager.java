@@ -101,8 +101,7 @@ public class OrganismManager {
         modifiedOrganisms.put(id, false);
     }
 
-    // returns list of animals in format 'id. name\n'
-    public String getOrganisms() {
+    public static String getOrganisms(boolean isAnimal) {
         Map<Long, ? extends Organism> organisms = isAnimal? animals : plants;
         StringBuilder sb = new StringBuilder();
 
@@ -113,6 +112,11 @@ public class OrganismManager {
         }
 
         return sb.toString();
+    }
+
+    // returns list of animals in format 'id. name\n'
+    public String getOrganisms() {
+        return getOrganisms(isAnimal);
     }
 
     private long getLastId(boolean isAnimal) {

@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import me.fairygel.entity.Ecosystem;
 import me.fairygel.entity.Soil;
 import me.fairygel.entity.Weather;
+import me.fairygel.entity.organism.Organism;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,4 +127,13 @@ public class EcosystemManager {
                 .collect(Collectors.toSet());
     }
 
+    @SneakyThrows
+    public void addOrganismToEcosystem(long id, Organism organism) {
+        Ecosystem ecosystem = ecosystems.get(id);
+        File ecosystemFile = ecosystemFiles.get(id);
+
+        ecosystem.addOrganism(organism);
+
+        mapper.writerWithDefaultPrettyPrinter().writeValue(ecosystemFile, ecosystem);
+    }
 }

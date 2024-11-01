@@ -59,7 +59,8 @@ public class OrganismController implements MenuController {
         }
     }
 
-    private void chooseOrganism() {
+    // return organism is animal or not
+    protected boolean chooseOrganism() {
         boolean end = false;
 
         while (!end) {
@@ -91,6 +92,8 @@ public class OrganismController implements MenuController {
         if (!organismManager.hasAnyOrganism()) {
             createFirstOrganism();
         }
+
+        return isAnimal;
     }
 
     private void createFirstOrganism() {
