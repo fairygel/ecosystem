@@ -9,8 +9,8 @@ public class EcosystemSimulator {
     private final MenuController mainMenuController;
 
     public EcosystemSimulator() {
-        MenuController ecosystemController = new EcosystemController();
         MenuController organismController = new OrganismController();
+        MenuController ecosystemController = new EcosystemController();
 
         mainMenuController = new MainMenuController(ecosystemController, organismController);
     }

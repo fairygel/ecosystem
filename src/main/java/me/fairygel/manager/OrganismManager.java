@@ -20,8 +20,8 @@ import java.io.*;
 public class OrganismManager {
     private boolean isAnimal;
 
-    private final Map<Long, Animal> animals = new HashMap<>();
-    private final Map<Long, Plant> plants = new HashMap<>();
+    private static final Map<Long, Animal> animals = new HashMap<>();
+    private static final Map<Long, Plant> plants = new HashMap<>();
 
     // boolean is a flag of updated animal. false = deleted, true = updated
     private final Map<Long, Boolean> modifiedOrganisms = new HashMap<>();
@@ -36,6 +36,10 @@ public class OrganismManager {
         this.isAnimal = isAnimal;
 
         createWriters();
+    }
+
+    public boolean hasAnyOrganism() {
+        return isAnimal? !animals.isEmpty(): !plants.isEmpty();
     }
 
     // -----------------CRUD OPERATIONS---------------
@@ -61,11 +65,21 @@ public class OrganismManager {
         organism.setName(name);
 
         // save to file
-        organismWriter.write(organism.toString());
+        organismWriter.write(organism.toSaveString());
     }
 
     public Organism readOrganismById(long id) {
         return isAnimal? animals.get(id): plants.get(id);
+    }
+
+    public static Organism readOrganismByIdAndType(long id, String type) {
+        if (type.equalsIgnoreCase("animal")) {
+            return animals.get(id);
+        } else if (type.equalsIgnoreCase("plant")) {
+            return plants.get(id);
+        } else {
+            throw new IllegalArgumentException("invalid type. Use 'animal' or 'plant'.");
+        }
     }
 
     public void updateOrganism(long id, String name, int energy) {
@@ -83,6 +97,7 @@ public class OrganismManager {
         } else {
             plants.remove(id);
         }
+
         modifiedOrganisms.put(id, false);
     }
 
@@ -92,10 +107,9 @@ public class OrganismManager {
         StringBuilder sb = new StringBuilder();
 
         for (Organism organism : organisms.values()) {
-            sb.append(organism.getId())
-                    .append(". ")
-                    .append(organism.getName())
-                    .append('\n');
+            sb.append (
+                    String.format("%s. %s, energy = %s%n", organism.getId(), organism.getName(), organism.getEnergy())
+            );
         }
 
         return sb.toString();
@@ -195,7 +209,7 @@ public class OrganismManager {
 
                 // if organism is in modified map and is updated then we replace it in file
                 if (modified.containsKey(id) && Boolean.TRUE.equals(modified.get(id))) {
-                    writer.write(readOrganismById(id).toString());
+                    writer.write(readOrganismById(id).toSaveString());
                 } else {
                     writer.write(line); // else we keep previous value
                 }

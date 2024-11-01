@@ -17,7 +17,7 @@ public class ScannerUtil {
 
             return input;
         } catch (InputMismatchException ignored) {
-            System.out.println("Invalid input, please enter a number.");
+            System.out.print("invalid input, please enter a number.\n> ");
             nextLine();
 
             return nextInt();
@@ -31,7 +31,7 @@ public class ScannerUtil {
 
             return input;
         } catch (InputMismatchException ignored) {
-            System.out.println("Invalid input, please enter a number.");
+            System.out.print("invalid input, please enter a number.\n> ");
             nextLine();
 
             return nextLong();

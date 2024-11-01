@@ -25,6 +25,7 @@ public class MainMenuController implements MenuController {
             System.out.println("1. manage ecosystems.");
             System.out.println("2. manage organisms.");
             System.out.println("3. exit.");
+            System.out.print("> ");
 
             choice = scanner.nextInt();
 

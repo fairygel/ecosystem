@@ -29,6 +29,7 @@ public class OrganismController implements MenuController {
             System.out.printf("4. update %s.%n", organismType);
             System.out.printf("5. delete %s.%n", organismType);
             System.out.println("6. go back.");
+            System.out.print("> ");
 
             int choice = scanner.nextInt();
 
@@ -37,7 +38,7 @@ public class OrganismController implements MenuController {
                     listOrganisms();
                     break;
                 case 2:
-                    createOrganisms();
+                    createOrganism();
                     break;
                 case 3:
                     readOrganism();
@@ -65,6 +66,7 @@ public class OrganismController implements MenuController {
             System.out.println("who you need?");
             System.out.println("1. animal");
             System.out.println("2. plant");
+            System.out.print("> ");
 
             int choice = scanner.nextInt();
 
@@ -85,17 +87,26 @@ public class OrganismController implements MenuController {
         }
 
         organismManager.start(isAnimal);
+
+        if (!organismManager.hasAnyOrganism()) {
+            createFirstOrganism();
+        }
+    }
+
+    private void createFirstOrganism() {
+        System.out.printf("there is no %s's! let's create the first one:%n", organismType);
+        createOrganism();
     }
 
     private long getId() {
         listOrganisms();
 
-        System.out.println("enter id: ");
+        System.out.print("enter id: ");
         long id = scanner.nextLong();
 
         // if organism with id not exist, ask again
         if (organismManager.readOrganismById(id) == null) {
-            System.out.printf("there is no organism with id=%s.%n", id);
+            System.out.printf("there is no %s with id=%s.%n", organismType, id);
             return getId();
         }
 
@@ -104,11 +115,11 @@ public class OrganismController implements MenuController {
 
     // -----------------------CRUD OPERATIONS--------------------------
 
-    private void createOrganisms() {
-        System.out.println("enter name of organism: ");
+    private void createOrganism() {
+        System.out.printf("enter name of %s: ", organismType);
         String name = scanner.nextLine();
 
-        System.out.println("enter enter energy of organism: ");
+        System.out.printf("enter enter energy of %s: ", organismType);
         int energy = scanner.nextInt();
 
         organismManager.createOrganism(name, energy);
@@ -116,29 +127,30 @@ public class OrganismController implements MenuController {
 
     // can read not existing organisms
     private void readOrganism() {
-        System.out.println("enter id of organism: ");
+        System.out.printf("enter id of %s: ", organismType);
 
         long id = scanner.nextLong();
         Organism organism = organismManager.readOrganismById(id);
 
         if (organism == null) {
-            System.out.printf("there is no organism with id=%s.%n", id);
-        } else {
-            String type = isAnimal? "animal" : "plant";
-            String name = organism.getName();
-            int energy = organism.getEnergy();
-
-            System.out.printf("%s with id = %s.%n name = %s, energy = %s.%n", type, id, name, energy);
+            System.out.printf("there is no %s with id=%s.%n", organismType, id);
+            return;
         }
+
+        String name = organism.getName();
+        int energy = organism.getEnergy();
+
+        System.out.printf("%s with id = %s.%nname = %s, energy = %s.%n", organismType, id, name, energy);
+
     }
 
     private void updateOrganism() {
         long id = getId();
 
-        System.out.println("enter name of organism: ");
+        System.out.printf("enter name of %s: ", organismType);
         String name = scanner.nextLine();
 
-        System.out.println("enter enter energy of organism: ");
+        System.out.printf("enter enter energy of %s: ", organismType);
         int energy = scanner.nextInt();
 
         organismManager.updateOrganism(id, name, energy);

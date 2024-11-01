@@ -1,29 +1,86 @@
 package me.fairygel.manager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import me.fairygel.entity.Ecosystem;
+import me.fairygel.entity.organism.Organism;
+import me.fairygel.utils.OrganismDeserializer;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EcosystemManager {
-    private final Set<Ecosystem> ecosystems = new HashSet<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<Long, Ecosystem> ecosystems = new HashMap<>();
+    private final Map<Long, File> ecosystemFiles = new HashMap<>();
 
-    @SneakyThrows
-    public void start() {
-        Set<File> ecosystemFiles = getEcosystemFiles();
+    private final ObjectMapper mapper = new ObjectMapper();
 
-        for (File file : ecosystemFiles) {
-            Ecosystem ecosystem = objectMapper.readValue(file, Ecosystem.class);
-            ecosystems.add(ecosystem);
+    public EcosystemManager() {
+        SimpleModule module = new SimpleModule();
+
+        OrganismDeserializer organismDeserializer = new OrganismDeserializer();
+
+        module.addDeserializer(Organism.class, organismDeserializer);
+        mapper.registerModule(module);
+
+        readEcosystems();
+    }
+
+    private void readEcosystems() {
+        Set<File> jsonFiles = getJsonFiles();
+
+        for (File file : jsonFiles) {
+            try {
+                Ecosystem ecosystem = mapper.readValue(file, Ecosystem.class);
+
+                if (ecosystem.isDeleted()) continue;
+
+                ecosystems.put(ecosystem.getId(), ecosystem);
+                ecosystemFiles.put(ecosystem.getId(), file);
+            } catch (IOException e) {
+                System.out.println("can't read file: " + file.getName());
+                System.out.println(e.getMessage());
+            }
         }
     }
 
-    private Set<File> getEcosystemFiles() {
+    // --------------------------CRUD OPERATIONS--------------------------
+    public String createEcosystem() {
+        return "";
+    }
+
+    public Ecosystem readEcosystemById(long id) {
+        return ecosystems.get(id);
+    }
+
+    public String updateEcosystem() {
+        return "";
+    }
+
+    public String deleteEcosystem() {
+        return "";
+    }
+
+    // returns list of ecosystems in format 'id. name\n'
+    public String getEcosystems() {
+        StringBuilder sb = new StringBuilder();
+
+        for (var pair: ecosystems.entrySet()) {
+            sb.append(pair.getKey())
+                    .append(". ")
+                    .append(pair.getValue().getName())
+                    .append('\n');
+        }
+
+        return sb.toString();
+    }
+
+    // --------------------------FILE OPERATIONS METHODS-------------------------------------
+
+    private Set<File> getJsonFiles() {
         String folderName = "./simulations/";
         File folderFile = new File(folderName);
 
@@ -45,29 +102,4 @@ public class EcosystemManager {
                 .collect(Collectors.toSet());
     }
 
-    public String getEcosystems() {
-        return ecosystems.stream()
-                .map(ecosystem -> ecosystem.getId() + ". " + ecosystem.getName())
-                .collect(Collectors.joining("\n"));
-    }
-
-    public String createEcosystem() {
-        return "";
-    }
-
-    public String deleteEcosystem() {
-        return "";
-    }
-
-    public String loadEcosystem(long id) {
-        return ecosystems.stream()
-                .filter(ecosystem -> ecosystem.getId() == id)
-                .findAny()
-                .map(Ecosystem::toString)
-                .orElse("Ecosystem not found");
-    }
-
-    public String editEcosystem() {
-        return "";
-    }
 }
