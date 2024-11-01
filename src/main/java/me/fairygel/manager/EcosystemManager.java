@@ -1,10 +1,10 @@
 package me.fairygel.manager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import lombok.SneakyThrows;
 import me.fairygel.entity.Ecosystem;
-import me.fairygel.entity.organism.Organism;
-import me.fairygel.utils.OrganismDeserializer;
+import me.fairygel.entity.Soil;
+import me.fairygel.entity.Weather;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,19 +13,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EcosystemManager {
+    private static final String ECOSYSTEMS_FOLDER = "./simulations/";
+    private static final String JSON = ".json";
+
     private final Map<Long, Ecosystem> ecosystems = new HashMap<>();
     private final Map<Long, File> ecosystemFiles = new HashMap<>();
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     public EcosystemManager() {
-        SimpleModule module = new SimpleModule();
-
-        OrganismDeserializer organismDeserializer = new OrganismDeserializer();
-
-        module.addDeserializer(Organism.class, organismDeserializer);
-        mapper.registerModule(module);
-
         readEcosystems();
     }
 
@@ -48,20 +44,46 @@ public class EcosystemManager {
     }
 
     // --------------------------CRUD OPERATIONS--------------------------
-    public String createEcosystem() {
-        return "";
+    @SneakyThrows
+    public void createEcosystem(String name, Weather weather, Soil soil) {
+        Ecosystem ecosystem = new Ecosystem();
+
+        ecosystem.setId(getLastId() + 1);
+        ecosystem.setSoil(soil);
+        ecosystem.setCurrentWeather(weather);
+        ecosystem.setName(name);
+
+        ecosystems.put(ecosystem.getId(), ecosystem);
+        ecosystemFiles.put(ecosystem.getId(), new File(ECOSYSTEMS_FOLDER + ecosystem.getName() + JSON));
+        mapper.writerWithDefaultPrettyPrinter().writeValue(new File(ECOSYSTEMS_FOLDER + name + JSON), ecosystem);
     }
 
     public Ecosystem readEcosystemById(long id) {
         return ecosystems.get(id);
     }
 
-    public String updateEcosystem() {
-        return "";
+    @SneakyThrows
+    public void updateEcosystem(long id, String name, Weather weather, Soil soil) {
+        Ecosystem ecosystem = readEcosystemById(id);
+        File ecosystemFile = ecosystemFiles.get(id);
+
+        ecosystem.setName(name);
+        ecosystem.setCurrentWeather(weather);
+        ecosystem.setSoil(soil);
+
+        mapper.writerWithDefaultPrettyPrinter().writeValue(ecosystemFile, ecosystem);
     }
 
-    public String deleteEcosystem() {
-        return "";
+    @SneakyThrows
+    public void deleteEcosystem(long id) {
+        Ecosystem ecosystem = readEcosystemById(id);
+        File ecosystemFile = ecosystemFiles.get(id);
+
+        ecosystem.setDeleted(true);
+        ecosystemFiles.remove(id);
+        ecosystems.remove(id);
+
+        mapper.writerWithDefaultPrettyPrinter().writeValue(ecosystemFile, ecosystem);
     }
 
     // returns list of ecosystems in format 'id. name\n'
@@ -78,11 +100,13 @@ public class EcosystemManager {
         return sb.toString();
     }
 
+    private long getLastId() {
+        return ecosystems.keySet().stream().max(Long::compareTo).orElse(-1L);
+    }
     // --------------------------FILE OPERATIONS METHODS-------------------------------------
 
     private Set<File> getJsonFiles() {
-        String folderName = "./simulations/";
-        File folderFile = new File(folderName);
+        File folderFile = new File(ECOSYSTEMS_FOLDER);
 
         // there is no folder
         if (!folderFile.exists()) {
@@ -96,9 +120,9 @@ public class EcosystemManager {
         }
 
         // return all files, that are in simulations folder
-        return Stream.of(Objects.requireNonNull(new File("./simulations/").listFiles()))
+        return Stream.of(Objects.requireNonNull(new File(ECOSYSTEMS_FOLDER).listFiles()))
                 .filter(file -> !file.isDirectory())
-                .filter(file -> file.getName().endsWith(".json"))
+                .filter(file -> file.getName().endsWith(JSON))
                 .collect(Collectors.toSet());
     }
 

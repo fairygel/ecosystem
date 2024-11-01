@@ -1,7 +1,7 @@
 package me.fairygel.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +9,7 @@ import lombok.Setter;
 import me.fairygel.entity.organism.Animal;
 import me.fairygel.entity.organism.Organism;
 import me.fairygel.entity.organism.Plant;
+import me.fairygel.utils.OrganismSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +21,14 @@ import java.util.List;
 public class Ecosystem {
     private long id;
     private String name;
-    private long passedDays;
+    private long passedDays = 0;
     @JsonProperty("isDeleted")
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 
     private Weather currentWeather;
     private Soil soil;
+
+    @JsonSerialize(contentUsing = OrganismSerializer.class)
     private List<Organism> organisms = new ArrayList<>();
 
     @Override

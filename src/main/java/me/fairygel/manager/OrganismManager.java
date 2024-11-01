@@ -120,6 +120,7 @@ public class OrganismManager {
 
         return organisms.keySet().stream().max(Long::compareTo).orElse(-1L);
     }
+
     // -----------------FILE OPERATIONS METHODS---------------------
 
     @SneakyThrows
