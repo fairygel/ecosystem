@@ -1,4 +1,4 @@
-package me.fairygel.entity;
+package me.fairygel.entity.organism;
 
 public class Animal extends Organism {
     public static Animal parse(String str) {

@@ -1,13 +1,11 @@
-package me.fairygel;
+package me.fairygel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import me.fairygel.entity.Organism;
-import me.fairygel.entity.Soil;
-import me.fairygel.entity.Weather;
+import me.fairygel.entity.organism.Organism;
 
 import java.util.List;
 

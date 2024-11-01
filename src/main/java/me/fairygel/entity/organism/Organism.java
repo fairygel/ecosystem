@@ -1,4 +1,4 @@
-package me.fairygel.entity;
+package me.fairygel.entity.organism;
 
 
 import lombok.Getter;
